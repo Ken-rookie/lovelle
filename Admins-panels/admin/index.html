@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#fff7fa">
+  <title>Lovelle Admin Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div id="toast-region" class="toast-region" aria-live="polite"></div>
+
+  <section id="login-view" class="login-layout">
+    <div class="login-art">
+      <div class="brand-lockup"><span class="brand-mark"><i data-lucide="gift"></i></span><span>lovelle<span class="brand-heart">♥</span></span></div>
+      <div class="login-art-copy">
+        <span class="eyebrow">THE GIFTING EDIT</span>
+        <h1>Little details.<br><em>Big feelings.</em></h1>
+        <p>Your thoughtful-gifting business, beautifully organized.</p>
+      </div>
+      <div class="floating-gift gift-one">🎀</div><div class="floating-gift gift-two">✿</div><div class="floating-gift gift-three">♡</div>
+      <div class="login-art-foot">MADE WITH LOVE · LOVELLE ADMIN</div>
+    </div>
+    <div class="login-panel">
+      <div class="mobile-brand brand-lockup"><span class="brand-mark"><i data-lucide="gift"></i></span><span>lovelle<span class="brand-heart">♥</span></span></div>
+      <div class="login-heading"><span class="eyebrow">WELCOME BACK</span><h2>Sign in to your studio</h2><p>Manage your gifts, orders, and customers in one place.</p></div>
+      <form id="login-form" class="form-stack">
+        <label>Email address<input id="login-email" type="email" autocomplete="username" placeholder="admin@yourstore.com" required></label>
+        <label>Password<div class="password-wrap"><input id="login-password" type="password" autocomplete="current-password" placeholder="Enter your password" required><button type="button" class="icon-button" id="toggle-password" aria-label="Show password"><i data-lucide="eye"></i></button></div></label>
+        <button class="btn btn-primary btn-full" type="submit"><span>Sign in</span><i data-lucide="arrow-right"></i></button>
+        <p id="login-message" class="form-message"></p>
+      </form>
+      <div class="login-note"><i data-lucide="shield-check"></i><span>Secure access for authorized Lovelle administrators.</span></div>
+      <p class="setup-hint">First time? Configure your Supabase URL, publishable key, and authorized admin email in <code>config.js</code>.</p>
+    </div>
+  </section>
+
+  <div id="app-view" class="app-layout hidden">
+    <aside class="sidebar" id="sidebar">
+      <a class="sidebar-brand" href="#" data-page="overview"><span class="brand-mark"><i data-lucide="gift"></i></span><span class="brand-word">lovelle<span class="brand-heart">♥</span><small>ADMIN STUDIO</small></span></a>
+      <div class="store-chip"><span class="store-avatar">L</span><span><b>Lovelle Gift Shop</b><small>Store workspace</small></span><span class="live-dot"></span></div>
+      <div class="nav-caption">WORKSPACE</div>
+      <nav class="main-nav">
+        <button class="nav-item active" data-page="overview"><i data-lucide="layout-dashboard"></i><span>Overview</span></button>
+        <button class="nav-item" data-page="products"><i data-lucide="package"></i><span>Products</span><span class="nav-count" id="nav-product-count">—</span></button>
+        <button class="nav-item" data-page="orders"><i data-lucide="shopping-bag"></i><span>Orders</span><span class="nav-count" id="nav-order-count">—</span></button>
+        <button class="nav-item" data-page="customers"><i data-lucide="users"></i><span>Customers</span></button>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="help-card"><span class="help-sparkle">✦</span><b>Keep it lovely</b><p>Small thoughtful touches make every order special.</p></div>
+        <button class="nav-item" data-page="settings"><i data-lucide="settings-2"></i><span>Settings & connection</span></button>
+        <button class="nav-item logout-link" id="logout-btn"><i data-lucide="log-out"></i><span>Sign out</span></button>
+      </div>
+      <div class="sidebar-footer"><span class="status-dot"></span> Lovelle Admin <span>·</span> v1.0</div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <button id="mobile-menu" class="icon-button mobile-menu" aria-label="Open menu"><i data-lucide="menu"></i></button>
+        <div class="breadcrumb"><span>Workspace</span><i data-lucide="chevron-right"></i><b id="breadcrumb-page">Overview</b></div>
+        <div class="topbar-actions"><span class="today-label" id="today-label"></span><span class="topbar-divider"></span><button class="icon-button" id="refresh-btn" aria-label="Refresh data"><i data-lucide="refresh-cw"></i></button><div class="admin-avatar" id="admin-avatar">A</div><div class="admin-identity"><b id="admin-name">Administrator</b><small>Store admin</small></div></div>
+      </header>
+      <div class="content-wrap">
+        <div id="connection-banner" class="connection-banner hidden"><i data-lucide="alert-circle"></i><div><b>Database connection needs attention</b><span id="connection-message">Check your Supabase settings.</span></div><button class="text-button" data-page="settings">Review settings</button></div>
+
+        <section class="page-section active" id="page-overview">
+          <div class="page-heading"><div><span class="eyebrow">YOUR STORE AT A GLANCE</span><h1>Good day, <span id="greeting-name">Admin</span> <span class="heading-sparkle">✦</span></h1><p>Here's what's happening at Lovelle today.</p></div><button class="btn btn-primary" data-action="add-product"><i data-lucide="plus"></i> Add a product</button></div>
+          <div class="metric-grid">
+            <article class="metric-card metric-rose"><div class="metric-top"><span>Total products</span><span class="metric-icon"><i data-lucide="package"></i></span></div><div class="metric-value" id="metric-products">—</div><div class="metric-foot"><span class="metric-dot"></span><span>In your catalog</span></div></article>
+            <article class="metric-card"><div class="metric-top"><span>Total orders</span><span class="metric-icon icon-lilac"><i data-lucide="shopping-bag"></i></span></div><div class="metric-value" id="metric-orders">—</div><div class="metric-foot"><span class="metric-dot lilac-dot"></span><span>All recorded orders</span></div></article>
+            <article class="metric-card"><div class="metric-top"><span>Pending orders</span><span class="metric-icon icon-peach"><i data-lucide="clock-3"></i></span></div><div class="metric-value" id="metric-pending">—</div><div class="metric-foot"><span class="metric-dot peach-dot"></span><span>Need your attention</span></div></article>
+            <article class="metric-card"><div class="metric-top"><span>Customers</span><span class="metric-icon icon-sage"><i data-lucide="users"></i></span></div><div class="metric-value" id="metric-customers">—</div><div class="metric-foot"><span class="metric-dot sage-dot"></span><span>Registered profiles</span></div></article>
+          </div>
+          <div class="overview-grid">
+            <article class="panel order-panel"><div class="panel-heading"><div><h3>Recent orders</h3><p>Your latest customer purchases</p></div><button class="text-button" data-page="orders">View all <i data-lucide="arrow-up-right"></i></button></div><div id="recent-orders" class="table-wrap"><div class="loading-state">Loading your latest orders…</div></div></article>
+            <article class="panel inventory-panel"><div class="panel-heading"><div><h3>Inventory watch</h3><p>Gifts running low or unavailable</p></div><i data-lucide="package-search" class="panel-heading-icon"></i></div><div id="inventory-watch" class="inventory-list"><div class="loading-state">Checking stock…</div></div><button class="btn btn-soft btn-full" data-page="products">Manage inventory <i data-lucide="arrow-right"></i></button></article>
+          </div>
+          <article class="panel quick-panel"><div class="panel-heading"><div><h3>Quick actions</h3><p>Make something lovely happen</p></div></div><div class="quick-actions"><button class="quick-action" data-action="add-product"><span class="quick-icon"><i data-lucide="package-plus"></i></span><span><b>Add new product</b><small>Grow your gift collection</small></span><i data-lucide="chevron-right"></i></button><button class="quick-action" data-page="orders"><span class="quick-icon quick-lilac"><i data-lucide="clipboard-list"></i></span><span><b>Review orders</b><small>Update customer purchases</small></span><i data-lucide="chevron-right"></i></button><button class="quick-action" data-page="customers"><span class="quick-icon quick-peach"><i data-lucide="heart-handshake"></i></span><span><b>View customers</b><small>See your Lovelle community</small></span><i data-lucide="chevron-right"></i></button></div></article>
+        </section>
+
+        <section class="page-section" id="page-products">
+          <div class="page-heading"><div><span class="eyebrow">YOUR GIFT COLLECTION</span><h1>Products <span class="heading-sparkle">✦</span></h1><p>Manage your catalog, pricing, and stock.</p></div><button class="btn btn-primary" data-action="add-product"><i data-lucide="plus"></i> Add product</button></div>
+          <div class="panel toolbar-panel"><div class="search-box"><i data-lucide="search"></i><input id="product-search" type="search" placeholder="Search products…"></div><select id="product-status-filter" class="select-control"><option value="all">All products</option><option value="available">Available</option><option value="unavailable">Unavailable</option><option value="low">Low stock</option></select><button class="btn btn-outline" id="products-refresh"><i data-lucide="refresh-cw"></i> Refresh</button></div>
+          <div class="panel table-panel"><div class="table-wrap" id="products-table"><div class="loading-state">Loading products…</div></div><div class="table-bottom"><span id="products-count">0 products</span><span>Changes save to your connected database.</span></div></div>
+        </section>
+
+        <section class="page-section" id="page-orders">
+          <div class="page-heading"><div><span class="eyebrow">EVERY ORDER, THOUGHTFULLY HANDLED</span><h1>Orders <span class="heading-sparkle">✦</span></h1><p>Review purchases and keep customers updated.</p></div><button class="btn btn-outline" id="orders-refresh"><i data-lucide="refresh-cw"></i> Refresh orders</button></div>
+          <div class="panel toolbar-panel"><div class="search-box"><i data-lucide="search"></i><input id="order-search" type="search" placeholder="Search order ID or customer…"></div><select id="order-status-filter" class="select-control"><option value="all">All statuses</option><option value="pending">Pending</option><option value="confirmed">Confirmed</option><option value="preparing">Being prepared</option><option value="processing">Processing</option><option value="shipped">Shipped</option><option value="out_for_delivery">Out for delivery</option><option value="ready_for_pickup">Ready for pickup</option><option value="delivered">Delivered</option><option value="picked_up">Picked up</option><option value="cancelled">Cancelled</option></select></div>
+          <div class="panel table-panel"><div class="table-wrap" id="orders-table"><div class="loading-state">Loading orders…</div></div><div class="table-bottom"><span id="orders-count">0 orders</span><span>Statuses are shared with customer order tracking.</span></div></div>
+        </section>
+
+        <section class="page-section" id="page-customers">
+          <div class="page-heading"><div><span class="eyebrow">THE PEOPLE BEHIND THE PRESENTS</span><h1>Customers <span class="heading-sparkle">✦</span></h1><p>A little view into your Lovelle community.</p></div><button class="btn btn-outline" id="customers-refresh"><i data-lucide="refresh-cw"></i> Refresh</button></div>
+          <div class="panel toolbar-panel"><div class="search-box"><i data-lucide="search"></i><input id="customer-search" type="search" placeholder="Search name or email…"></div><span class="toolbar-note"><i data-lucide="shield-check"></i> Customer information is private.</span></div>
+          <div class="panel table-panel"><div class="table-wrap" id="customers-table"><div class="loading-state">Loading customers…</div></div><div class="table-bottom"><span id="customers-count">0 customers</span><span>Only data allowed by your Supabase policies will appear.</span></div></div>
+        </section>
+
+        <section class="page-section" id="page-settings">
+          <div class="page-heading"><div><span class="eyebrow">ADMIN WORKSPACE</span><h1>Settings & connection</h1><p>Check your database connection and admin access.</p></div></div>
+          <div class="settings-grid">
+            <article class="panel settings-card"><div class="settings-title"><span class="settings-icon"><i data-lucide="database"></i></span><div><h3>Supabase connection</h3><p>Use the same project as your Lovelle customer app.</p></div></div><div class="form-stack settings-form"><label>Project URL<input id="config-url" type="url" placeholder="https://your-project.supabase.co"></label><label>Publishable / anon key<input id="config-key" type="password" placeholder="sb_publishable_… or anon key"></label><label>Authorized admin email<input id="config-admin-email" type="email" placeholder="admin@example.com"></label><button class="btn btn-primary" id="save-config"><i data-lucide="save"></i> Save connection settings</button><p class="settings-warning"><i data-lucide="alert-triangle"></i> Never use a service_role key in browser JavaScript. Client-side email checks are not a substitute for database Row Level Security (RLS).</p></div></article>
+            <article class="panel settings-card"><div class="settings-title"><span class="settings-icon settings-lilac"><i data-lucide="lock-keyhole"></i></span><div><h3>Security checklist</h3><p>Before using real customer data.</p></div></div><ul class="security-list"><li><i data-lucide="check-circle-2"></i><span>Use Supabase Auth for administrator sign-in.</span></li><li><i data-lucide="alert-circle"></i><span>Restrict products, orders, and customer records with server-enforced RLS policies.</span></li><li><i data-lucide="alert-circle"></i><span>Allow only approved admin accounts to update inventory and order status.</span></li><li><i data-lucide="alert-circle"></i><span>Do not expose PayMongo secret keys in this dashboard.</span></li></ul><div class="security-callout">Apply the access-control migration in the customer app’s supabase/migrations folder. The browser email allowlist is not a substitute for its database role and RLS policies.</div></article>
+          </div>
+          <article class="panel account-panel"><div class="panel-heading"><div><h3>Current session</h3><p>Signed-in account and connection health.</p></div><span class="status-pill" id="connection-status">Not connected</span></div><div class="session-details"><div><small>Signed-in email</small><b id="session-email">—</b></div><div><small>Supabase project</small><b id="session-project">Not configured</b></div><div><small>Last refreshed</small><b id="last-refreshed">—</b></div></div><button class="btn btn-outline" id="test-connection"><i data-lucide="plug-zap"></i> Test connection</button></article>
+        </section>
+      </div>
+      <footer class="main-footer"><span>© <span id="year"></span> Lovelle</span><span>Made for the moments that matter <b>♥</b></span></footer>
+    </main>
+  </div>
+
+  <div class="modal-backdrop hidden" id="product-modal">
+    <section class="modal-card" role="dialog" aria-modal="true" aria-labelledby="product-modal-title">
+      <div class="modal-heading"><div><span class="eyebrow">CATALOG EDITOR</span><h2 id="product-modal-title">Add a product</h2><p>Make room for another lovely gift.</p></div><button class="icon-button" data-close-modal aria-label="Close"><i data-lucide="x"></i></button></div>
+      <form id="product-form" class="modal-form">
+        <input type="hidden" id="product-id">
+        <div class="form-grid"><label>Product name<input id="product-name" required maxlength="120" placeholder="e.g. Pink Rose Bouquet"></label><label>Price (₱)<input id="product-price" type="number" min="0" step="0.01" required value="1.00"></label></div>
+        <div class="image-picker-field">
+          <span class="image-picker-label">Product image</span>
+          <div class="image-picker">
+            <div class="image-preview" id="product-image-preview"><span>Image preview</span></div>
+            <div class="image-picker-controls">
+              <label class="btn btn-outline image-picker-button" for="product-image-file"><i data-lucide="image-plus"></i> Choose image</label>
+              <input id="product-image-file" type="file" accept="image/jpeg,image/png,image/webp,image/gif" hidden>
+              <button type="button" class="text-button" id="clear-product-image">Remove image</button>
+              <small id="product-image-name">JPG, PNG, WebP, or GIF · up to 5 MB</small>
+            </div>
+          </div>
+        </div>
+        <label>Description<textarea id="product-description" rows="3" placeholder="Describe what makes this gift special…"></textarea></label>
+        <div class="form-grid"><label>Category<select id="product-category"><option value="">No category</option></select></label><label>Stock quantity<input id="product-stock" type="number" min="0" step="1" required value="10"></label></div>
+        <div class="form-grid toggle-fields"><label class="check-label"><input id="product-available" type="checkbox" checked> Available for sale</label><label class="check-label"><input id="product-featured" type="checkbox"> Featured gift</label></div>
+        <p class="modal-error" id="product-error"></p>
+        <div class="modal-actions"><button type="button" class="btn btn-outline" data-close-modal>Cancel</button><button type="submit" class="btn btn-primary" id="save-product-btn"><i data-lucide="check"></i> Save product</button></div>
+      </form>
+    </section>
+  </div>
+
+  <div class="modal-backdrop hidden" id="order-modal">
+    <section class="modal-card small-modal" role="dialog" aria-modal="true" aria-labelledby="order-modal-title">
+      <div class="modal-heading"><div><span class="eyebrow">ORDER DETAILS</span><h2 id="order-modal-title">Order</h2><p id="order-modal-subtitle"></p></div><button class="icon-button" data-close-modal aria-label="Close"><i data-lucide="x"></i></button></div>
+      <div id="order-modal-body"></div>
+      <div class="modal-actions"><button class="btn btn-outline" data-close-modal>Close</button><button class="btn btn-primary" id="save-order-status"><i data-lucide="check"></i> Save status</button></div>
+      <p class="modal-error" id="order-error"></p>
+    </section>
+  </div>
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
