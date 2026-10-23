@@ -133,6 +133,7 @@ void main() {
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(const PawcheApp());
+    expect(find.text('Loading Pawché…'), findsOneWidget);
     await tester.pump(const Duration(milliseconds: 1500));
     await tester.pumpAndSettle();
 
