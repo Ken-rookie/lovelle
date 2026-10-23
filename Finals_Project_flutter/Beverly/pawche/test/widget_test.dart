@@ -409,6 +409,12 @@ void main() {
       find.text('Live catalog unavailable'),
       findsOneWidget,
     );
+    expect(
+      find.textContaining(
+        'Supabase is not configured or failed to initialize',
+      ),
+      findsOneWidget,
+    );
 
     await tester.tap(find.byTooltip('Clear search'));
     await tester.pump();

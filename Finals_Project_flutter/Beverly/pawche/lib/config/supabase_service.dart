@@ -5,24 +5,45 @@ import 'app_config.dart';
 class SupabaseService {
   static bool get isConfigured => AppConfig.hasSupabase;
   static bool _initialized = false;
+  static bool _initializationStarted = false;
+  static Future<void>? _initialization;
 
   static SupabaseClient? get client =>
       isConfigured ? Supabase.instance.client : null;
   static SupabaseClient? get initializedClient =>
       isConfigured && _initialized ? Supabase.instance.client : null;
 
-  static Future<void> initialize() async {
+  static Future<void> initialize() {
     if (!isConfigured) {
       debugPrint(
         'Pawche: Supabase is not configured; authentication is unavailable.',
       );
-      return;
+      return Future<void>.value();
     }
+    _initializationStarted = true;
+    return _initialization ??= _initialize().catchError(
+      (Object error, StackTrace stackTrace) {
+        _initialization = null;
+        Error.throwWithStackTrace(error, stackTrace);
+      },
+    );
+  }
+
+  static Future<void> _initialize() async {
     await Supabase.initialize(
       url: AppConfig.supabaseUrl,
       publishableKey: AppConfig.supabaseAnonKey,
     );
     _initialized = true;
+  }
+
+  static Future<void> waitForInitialization() async {
+    if (_initializationStarted && _initialization == null) {
+      await initialize();
+    } else {
+      final initialization = _initialization;
+      if (initialization != null) await initialization;
+    }
   }
 
   static Future<void> signUp({

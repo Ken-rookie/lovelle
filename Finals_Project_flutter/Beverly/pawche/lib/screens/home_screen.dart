@@ -47,7 +47,9 @@ class _HomeScreenState extends State<HomeScreen> {
           _catalogLoading = false;
         });
       }
-    } catch (error) {
+    } catch (error, stackTrace) {
+      debugPrint('Pawche featured catalog load failed: $error');
+      debugPrintStack(stackTrace: stackTrace);
       if (mounted) {
         setState(() {
           _featuredProducts = [];
@@ -262,21 +264,34 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(color: PawcheColors.border),
                   ),
-                  child: Row(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Expanded(
-                        child: Text(
-                          'Live products are temporarily unavailable. No sample products are being shown.',
-                          style: TextStyle(
-                            color: PawcheColors.muted,
-                            fontSize: 12,
-                            height: 1.35,
+                      Row(
+                        children: [
+                          const Expanded(
+                            child: Text(
+                              'Live products are temporarily unavailable. No sample products are being shown.',
+                              style: TextStyle(
+                                color: PawcheColors.muted,
+                                fontSize: 12,
+                                height: 1.35,
+                              ),
+                            ),
                           ),
-                        ),
+                          TextButton(
+                            onPressed: _loadFeaturedProducts,
+                            child: const Text('Retry'),
+                          ),
+                        ],
                       ),
-                      TextButton(
-                        onPressed: _loadFeaturedProducts,
-                        child: const Text('Retry'),
+                      const SizedBox(height: 6),
+                      SelectableText(
+                        _catalogLoadError.toString(),
+                        style: const TextStyle(
+                          color: PawcheColors.muted,
+                          fontSize: 11,
+                        ),
                       ),
                     ],
                   ),

@@ -52,7 +52,9 @@ class _ShopScreenState extends State<ShopScreen> {
         _catalogLoading = false;
         _ratingSummaries = {};
       });
-    } catch (error) {
+    } catch (error, stackTrace) {
+      debugPrint('Pawche shop catalog load failed: $error');
+      debugPrintStack(stackTrace: stackTrace);
       if (mounted) {
         setState(() {
           _catalog = [];
@@ -320,6 +322,15 @@ class _ShopScreenState extends State<ShopScreen> {
                                 style: TextStyle(
                                   color: PawcheColors.muted,
                                   height: 1.4,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              SelectableText(
+                                _catalogLoadError.toString(),
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(
+                                  color: PawcheColors.muted,
+                                  fontSize: 11,
                                 ),
                               ),
                               const SizedBox(height: 12),

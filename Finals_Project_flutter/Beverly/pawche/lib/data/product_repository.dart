@@ -4,10 +4,11 @@ import '../models/product_review.dart';
 
 class ProductRepository {
   static Future<List<Product>> loadCatalog() async {
+    await SupabaseService.waitForInitialization();
     final client = SupabaseService.initializedClient;
     if (client == null) {
       throw StateError(
-        'Live products are unavailable because Supabase is not configured.',
+        'Live products are unavailable because Supabase is not configured or failed to initialize.',
       );
     }
 
@@ -17,7 +18,8 @@ class ProductRepository {
           'slug, name, category, description, price, currency, stock_quantity, image_url',
         )
         .eq('is_active', true)
-        .order('name');
+        .order('name')
+        .timeout(const Duration(seconds: 20));
 
     return List<Map<String, dynamic>>.from(rows).map((row) {
       final slug = row['slug'] as String;
